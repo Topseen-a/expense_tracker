@@ -1,6 +1,10 @@
 from app.models.expense import Expense
 from app.repositories.expense_repository import ExpenseRepository
-from app.schemas.expense_schema import CreateExpenseRequest, UpdateExpenseRequest, ExpenseResponse
+from app.schemas.expense_schema import (
+    CreateExpenseRequest,
+    UpdateExpenseRequest,
+    ExpenseResponse
+)
 from app.exceptions.expense_exceptions import ExpenseNotFoundException
 
 
@@ -23,7 +27,9 @@ class ExpenseService:
             user_id=user_id
         )
 
-        return self.expense_repo.create_expense(expense)
+        saved_expense = self.expense_repo.create_expense(expense)
+
+        return ExpenseResponse(saved_expense).to_dict()
 
 
     def get_expense_by_id(self, expense_id):
@@ -32,11 +38,16 @@ class ExpenseService:
         if not expense:
             raise ExpenseNotFoundException()
 
-        return expense
+        return ExpenseResponse(expense).to_dict()
 
 
     def get_user_expenses(self, user_id):
-        return self.expense_repo.get_expenses_by_user_id(user_id)
+        expenses = self.expense_repo.get_expenses_by_user_id(user_id)
+
+        return [
+            ExpenseResponse(expense).to_dict()
+            for expense in expenses
+        ]
 
 
     def get_all_expenses(self):
@@ -66,7 +77,7 @@ class ExpenseService:
 
         self.expense_repo.update_expense()
 
-        return expense
+        return ExpenseResponse(expense).to_dict()
 
 
     def delete_expense(self, expense_id):
@@ -76,3 +87,5 @@ class ExpenseService:
             raise ExpenseNotFoundException()
 
         self.expense_repo.delete_expense(expense)
+
+        return {"message": "Expense deleted successfully"}
