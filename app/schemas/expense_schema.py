@@ -6,9 +6,12 @@ class CreateExpenseRequest:
     def validate_create_expense_request(self):
         errors = {}
 
-        if self.amount is None or self.amount <= 0:
+        if self.amount is None:
+            errors["amount"] = "Amount is required"
+        elif self.amount <= 0:
             errors["amount"] = "Amount must be greater than 0"
-        if not self.category:
+
+        if not self.category or not self.category.strip():
             errors["category"] = "Category is required"
 
         return errors
@@ -32,10 +35,13 @@ class UpdateExpenseRequest:
 
 class ExpenseResponse:
     def __init__(self, expense):
+        if not expense:
+            raise ValueError("Expense cannot be None")
+
         self.id = expense.id
         self.amount = expense.amount
         self.category = expense.category
-        self.date = expense.date.isoformat()
+        self.date = expense.date.isoformat() if expense.date else None
 
     def to_dict(self):
         return {

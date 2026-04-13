@@ -10,16 +10,14 @@ class UserRepository:
         return user
 
     def get_user_by_id(self, user_id: int):
-        return User.query.get(user_id)
+        return db.session.get(User, user_id)
 
     def get_user_by_email(self, email: str):
         return User.query.filter_by(email=email).first()
 
-    def get_all_users(self):
-        return User.query.all()
-
-    def update_user(self):
+    def update_user(self, user: User):
         db.session.commit()
+        return user
 
     def delete_user(self, user: User):
         db.session.delete(user)
