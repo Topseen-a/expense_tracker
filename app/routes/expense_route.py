@@ -38,7 +38,6 @@ def get_expense(expense_id):
 @jwt_required()
 def get_user_expenses():
     user_id = get_jwt_identity()
-
     result = expense_service.get_user_expenses(user_id)
     return jsonify(result), 200
 
