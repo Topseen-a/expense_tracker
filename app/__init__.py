@@ -5,12 +5,12 @@ from flask_jwt_extended import JWTManager
 def create_app():
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///expense.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:tope@localhost/expense_db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
     db.init_app(app)
-    jwt = JWTManager(app)
+    JWTManager(app)
 
     from app.routes.user_route import user_bp
     from app.routes.expense_route import expense_bp

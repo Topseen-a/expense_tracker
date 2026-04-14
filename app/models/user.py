@@ -10,12 +10,7 @@ class User(db.Model):
     phone_number = db.Column(db.String(11), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True),server_default=db.func.now())
-    expenses = db.relationship(
-        "Expense",
-        backref="user",
-        lazy=True,
-        cascade="all, delete-orphan"
-    )
+    expenses = db.relationship("Expense",backref="user",lazy=True,cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
