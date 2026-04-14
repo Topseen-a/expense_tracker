@@ -31,7 +31,7 @@ class ExpenseService:
         expense = self.expense_repo.get_expense_by_id(expense_id)
         if not expense:
             raise ExpenseNotFoundException()
-        if expense.user_id != user_id:
+        if expense.user_id != int(user_id):
             raise UnauthorizedExpenseAccessException()
 
         return ExpenseResponse(expense).to_dict()
@@ -55,7 +55,7 @@ class ExpenseService:
 
         if not expense:
             raise ExpenseNotFoundException()
-        if expense.user_id != user_id:
+        if expense.user_id != int(user_id):
             raise UnauthorizedExpenseAccessException()
         if request.amount is not None:
             expense.amount = request.amount

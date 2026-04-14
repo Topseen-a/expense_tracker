@@ -15,7 +15,7 @@ def create_app():
     from app.routes.user_route import user_bp
     from app.routes.expense_route import expense_bp
 
-    app.register_blueprint(user_bp, url_prefix="/api/users")
-    app.register_blueprint(expense_bp, url_prefix="/expenses")
+    app.register_blueprint(user_bp, url_prefix="/user")
+    app.register_blueprint(expense_bp, url_prefix="/expense")
 
     return app
