@@ -65,7 +65,6 @@ class UserService:
         return UserResponse(user).to_dict()
 
 
-
     def update_user(self, user_id, data):
         user = self.user_repo.get_user_by_id(user_id)
         if not user:
