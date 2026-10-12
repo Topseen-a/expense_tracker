@@ -1,12 +1,11 @@
-class ExpenseNotFoundException(Exception):
-    def __init__(self, message="Expense not found"):
-        self.message = message
-        self.status_code = 404
-        super().__init__(message)
+from app.exceptions.base import AppException
 
 
-class UnauthorizedExpenseAccessException(Exception):
-    def __init__(self, message="You cannot access this expense"):
-        self.message = message
-        self.status_code = 403
-        super().__init__(message)
+class ExpenseNotFoundException(AppException):
+    status_code = 404
+    message = "Expense not found"
+
+
+class UnauthorizedExpenseAccessException(AppException):
+    status_code = 403
+    message = "You cannot access this expense"

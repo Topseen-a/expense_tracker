@@ -1,0 +1,16 @@
+[project]
+name = "expense-tracker"
+version = "1.0.0"
+description = "REST API for tracking personal expenses"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

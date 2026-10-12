@@ -1,41 +1,37 @@
 from flask_jwt_extended import create_access_token
+
+from app.exceptions.user_exceptions import (
+    EmailAlreadyExistsException,
+    InvalidCredentialsException,
+    UserNotFoundException,
+)
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user_schema import CreateUserRequest, LoginUserRequest, UserResponse
-from app.exceptions.user_exceptions import UserNotFoundException, EmailAlreadyExistsException, InvalidCredentialsException
+from app.schemas.user_schema import CreateUserRequest, LoginUserRequest, UpdateUserRequest, UserResponse
 
 
 class UserService:
-    def __init__(self):
-        self.user_repo = UserRepository()
-
+    def __init__(self, user_repo=None):
+        self.user_repo = user_repo or UserRepository()
 
     def register_user(self, data):
-        request = CreateUserRequest(data)
-        errors = request.validate_create_user_request()
-        if errors:
-            return {"errors": errors}
+        request = CreateUserRequest(data).validate()
 
-        existing_user = self.user_repo.get_user_by_email(request.email)
-        if existing_user:
+        if self.user_repo.get_user_by_email(request.email):
             raise EmailAlreadyExistsException()
 
         user = User(
             name=request.name,
             email=request.email,
-            phone_number=request.phone_number
+            phone_number=request.phone_number,
         )
         user.set_password(request.password)
         saved_user = self.user_repo.create_user(user)
 
         return UserResponse(saved_user).to_dict()
 
-
     def login_user(self, data):
-        request = LoginUserRequest(data)
-        errors = request.validate_login_user_request()
-        if errors:
-            return {"errors": errors}
+        request = LoginUserRequest(data).validate()
 
         user = self.user_repo.get_user_by_email(request.email)
         if not user or not user.check_password(request.password):
@@ -45,45 +41,40 @@ class UserService:
 
         return {
             "access_token": access_token,
-            "user": UserResponse(user).to_dict()
+            "user": UserResponse(user).to_dict(),
         }
 
+    def get_user_by_id(self, user_id: int):
+        return UserResponse(self._get_user(user_id)).to_dict()
 
-    def get_user_by_id(self, user_id):
-        user = self.user_repo.get_user_by_id(user_id)
-        if not user:
-            raise UserNotFoundException()
-
-        return UserResponse(user).to_dict()
-
-
-    def get_user_by_email(self, email):
+    def get_user_by_email(self, email: str):
         user = self.user_repo.get_user_by_email(email)
         if not user:
             raise UserNotFoundException()
 
         return UserResponse(user).to_dict()
 
+    def update_user(self, user_id: int, data):
+        request = UpdateUserRequest(data).validate()
+        user = self._get_user(user_id)
 
-    def update_user(self, user_id, data):
-        user = self.user_repo.get_user_by_id(user_id)
-        if not user:
-            raise UserNotFoundException()
-        if "name" in data and data["name"]:
-            user.name = data["name"]
-        if "phone_number" in data and data["phone_number"]:
-            user.phone_number = data["phone_number"]
-        if "password" in data and data["password"]:
-            user.set_password(data["password"])
+        if request.name is not None:
+            user.name = request.name
+        if request.phone_number is not None:
+            user.phone_number = request.phone_number
+        if request.password is not None:
+            user.set_password(request.password)
 
         self.user_repo.update_user(user)
         return UserResponse(user).to_dict()
 
+    def delete_user(self, user_id: int):
+        user = self._get_user(user_id)
+        self.user_repo.delete_user(user)
+        return {"message": "User deleted successfully"}
 
-    def delete_user(self, user_id):
+    def _get_user(self, user_id: int):
         user = self.user_repo.get_user_by_id(user_id)
         if not user:
             raise UserNotFoundException()
-
-        self.user_repo.delete_user(user)
-        return {"message": "User deleted successfully"}
+        return user

@@ -1,19 +1,16 @@
-class UserNotFoundException(Exception):
-    def __init__(self, message="User not found"):
-        self.message = message
-        self.status_code = 404
-        super().__init__(message)
+from app.exceptions.base import AppException
 
 
-class EmailAlreadyExistsException(Exception):
-    def __init__(self, message="Email already exists"):
-        self.message = message
-        self.status_code = 409
-        super().__init__(message)
+class UserNotFoundException(AppException):
+    status_code = 404
+    message = "User not found"
 
 
-class InvalidCredentialsException(Exception):
-    def __init__(self, message="Invalid email or password"):
-        self.message = message
-        self.status_code = 401
-        super().__init__(message)
+class EmailAlreadyExistsException(AppException):
+    status_code = 409
+    message = "Email already exists"
+
+
+class InvalidCredentialsException(AppException):
+    status_code = 401
+    message = "Invalid email or password"
