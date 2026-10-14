@@ -129,3 +129,7 @@ Every error response is JSON:
 | 404 | Resource not found |
 | 409 | Email already registered |
 | 500 | Unexpected server error |
+
+## Author
+
+Built by [Temitope](https://github.com/Topseen-a).
